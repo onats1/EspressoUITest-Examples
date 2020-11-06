@@ -1,46 +1,38 @@
 package com.codingwithmitch.espressouitestexamples.ui.movie
 
 import android.os.Bundle
+import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.codingwithmitch.espressouitestexamples.R
-import com.codingwithmitch.espressouitestexamples.factory.MovieFragmentFactory
 import org.junit.Test
-
 import org.junit.runner.RunWith
-import java.lang.StringBuilder
 
 @RunWith(AndroidJUnit4ClassRunner::class)
-class StarActorsFragmentTest{
-
+class StarActorsFragmentTest {
 
     @Test
-    fun test_isActorsListVisible() {
+    fun is_directorsListVisible() {
 
-        // GIVEN
-        val actors = arrayListOf(
-            "Dwayne Johnson",
-            "Seann William Scott",
-            "Rosario Dawson",
-            "Christopher Walken"
-        )
-        val fragmentFactory = MovieFragmentFactory()
+        val starActors =  arrayListOf("Dwayne Johnson", "Seann William Scott", "Rosario Dawson", "Christopher Walken")
+        val fragmentFactory = FragmentFactory()
         val bundle = Bundle()
-        bundle.putStringArrayList("args_actors", actors)
+        bundle.putStringArrayList("args_actors", starActors)
+
         val scenario = launchFragmentInContainer<StarActorsFragment>(
             fragmentArgs = bundle,
             factory = fragmentFactory
         )
 
-        // VERIFY
-        onView(withId(R.id.star_actors_text))
-            .check(matches(withText(
-                StarActorsFragment.stringBuilderForStarActors(actors)
-            )))
+        Espresso.onView(ViewMatchers.withId(R.id.star_actors_text)).check(
+            ViewAssertions.matches(
+                ViewMatchers.withText(
+                    StarActorsFragment.stringBuilderForStarActors(starActors)
+                )
+            )
+        )
     }
 }
-
