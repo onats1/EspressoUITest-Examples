@@ -1,7 +1,7 @@
 package com.codingwithmitch.espressouitestexamples
 
 import android.app.Activity
-import android.app.Instrumentation.ActivityResult
+import android.app.Instrumentation
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -16,45 +16,44 @@ import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.codingwithmitch.espressouitestexamples.ImageViewHasDrawableMatcher.hasDrawable
-import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matcher
+import org.hamcrest.Matchers.not
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4ClassRunner::class)
-class MainActivityTest{
+class MainActivityTest {
 
-    @get:Rule
-    val intentsTestRule = IntentsTestRule(MainActivity::class.java)
+    @get: Rule
+    val intentRule = IntentsTestRule(MainActivity::class.java)
 
     @Test
-    fun  test_cameraIntent() {
+    fun test_cameraIntent_isBitmapSetToImageView() {
 
-        // GIVEN
         val activityResult = createImageCaptureActivityResultStub()
         val expectedIntent: Matcher<Intent> = hasAction(MediaStore.ACTION_IMAGE_CAPTURE)
         intending(expectedIntent).respondWith(activityResult)
 
-        // Execute and Verify
         onView(withId(R.id.image)).check(matches(not(hasDrawable())))
         onView(withId(R.id.button_launch_camera)).perform(click())
-        intended(expectedIntent)
-        onView(withId(R.id.image)).check(matches(hasDrawable()))
+        intending(expectedIntent)
+        onView((withId(R.id.image))).check(matches(hasDrawable()))
     }
 
-    private fun createImageCaptureActivityResultStub(): ActivityResult? {
+    private fun createImageCaptureActivityResultStub(): Instrumentation.ActivityResult? {
         val bundle = Bundle()
         bundle.putParcelable(
-            KEY_IMAGE_DATA, BitmapFactory.decodeResource(
-                intentsTestRule.getActivity().getResources(),
+            KEY_IMAGE_DATA,
+            BitmapFactory.decodeResource(
+                intentRule.activity.resources,
                 R.drawable.ic_launcher_background
             )
         )
         val resultData = Intent()
         resultData.putExtras(bundle)
-        return ActivityResult(Activity.RESULT_OK, resultData)
+        return Instrumentation.ActivityResult(Activity.RESULT_OK, resultData)
     }
 }
 
